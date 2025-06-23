@@ -17,6 +17,12 @@ app.post('/', async (req, res) => {
 
     const receivedToken = req.headers['x-kirvano-token'];
 
+    // --- LINHAS DE DEPURACAO TEMPORARIAS ---
+    console.log(`[DEBUG] Token Recebido (Kirvano): '${receivedToken}'`);
+    console.log(`[DEBUG] Token Esperado (Vercel ENV): '${KIRVANO_WEBHOOK_SECRET}'`);
+    console.log(`[DEBUG] Comparacao Direta: ${receivedToken === KIRVANO_WEBHOOK_SECRET}`);
+    // --- FIM DAS LINHAS DE DEPURACAO ---
+
      if (!KIRVANO_WEBHOOK_SECRET || receivedToken !== KIRVANO_WEBHOOK_SECRET) {
         console.warn('Alerta de Segurança: Requisição de webhook não autorizada ou token inválido!!');
         // Responde com erro 401 Unauthorizeda
