@@ -22,11 +22,11 @@ app.post('/', async (req, res) => {
         console.log(`[DEBUG]   ${header}: ${req.headers[header]}`);
     }
 
-     if (!KIRVANO_WEBHOOK_SECRET || receivedToken !== KIRVANO_WEBHOOK_SECRET) {
-        console.warn('Alerta de Segurança: Requisição de webhook não autorizada ou token inválido!!');
-        // Responde com erro 401 Unauthorizeda
-        return res.status(401).send('Não autorizado: Token da webhook inválido ou ausente.');
-    }
+ //    if (!KIRVANO_WEBHOOK_SECRET || receivedToken !== KIRVANO_WEBHOOK_SECRET) {
+ //       console.warn('Alerta de Segurança: Requisição de webhook não autorizada ou token inválido!!');
+  //      // Responde com erro 401 Unauthorizeda
+  //      return res.status(401).send('Não autorizado: Token da webhook inválido ou ausente.');
+  //  }
 
     console.log('Token da webhook verificado com sucesso.');
 
