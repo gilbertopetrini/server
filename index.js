@@ -5,6 +5,8 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000; // Define a porta, usando 3000 como padrão se não for especificada
 
+const KIRVANO_WEBHOOK_SECRET = process.env.KIRVANO_WEBHOOK_SECRET;
+
 // Middleware para parsear o corpo das requisições JSON.
 // Isso é essencial para que o Express consiga ler os dados enviados pela Kirvano.
 app.use(express.json());
@@ -12,6 +14,16 @@ app.use(express.json());
 // --- Rota da Webhook da Kirvano ---
 app.post('/kirvano-webhook', (req, res) => {
     console.log('--- Webhook da Kirvano Recebida! ---');
+
+    const receivedToken = req.headers['x-kirvano-token'];
+
+     if (!KIRVANO_WEBHOOK_SECRET || receivedToken !== KIRVANO_WEBHOOK_SECRET) {
+        console.warn('Alerta de Segurança: Requisição de webhook não autorizada ou token inválido!');
+        // Responde com erro 401 Unauthorized
+        return res.status(401).send('Não autorizado: Token da webhook inválido ou ausente.');
+    }
+
+    console.log('Token da webhook verificado com sucesso.');
 
     // O corpo da requisição (req.body) contém os dados enviados pela Kirvano.
     const dadosVenda = req.body;
