@@ -63,15 +63,27 @@ function processarVenda(dadosVenda) {
 
 // --- Função para Criar o Login (Exemplo) ---
 async function criarLoginNoSistema(idVenda, email) {
-    console.log(`\n--- INICIANDO CRIAÇÃO DE LOGIN ---`);
-    console.log(`Tentando criar login para o email: ${email} (ID de Venda: ${idVenda})`);
+    console.log(`\n--- INICIANDO CRIAÇÃO DE LOGIN NO FIREBASE ---`);
+    console.log(`Tentando criar login para o email: ${email}`);
 
-    await createUserWithEmailAndPassword(auth, emailGerado, senhaGerada);
+    try {
+        // Tenta criar o usuário com e-mail e senha no Firebase Authentication
+        const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
+        const user = userCredential.user;
+        console.log(`Sucesso! Usuário Firebase criado com ID: ${user.uid} para o email: ${email}`);
+    } catch (error) {
+        // Captura e loga qualquer erro durante a criação do usuário no Firebase
+        console.error(`Erro ao criar usuário Firebase para o email ${email}:`, error.message);
+        // Você pode adicionar lógica para lidar com erros específicos do Firebase, como:
+        // - 'auth/email-already-in-use' (se o e-mail já existir)
+        // - 'auth/weak-password' (se a senha for muito fraca, embora 'idVenda' seja fraca)
+        throw error; // Propaga o erro para que a webhook responda com 500
+    }
 
-    await new Promise(resolve => setTimeout(resolve, 2000)); // Espera 2 segundos
+    // A linha abaixo simulava uma operação e pode ser removida se a criação do usuário for a única ação
+    // await new Promise(resolve => setTimeout(resolve, 2000)); // Espera 2 segundos
 
-    console.log(`Sucesso! Login para ${email} (ID: ${idVenda}) criado (simulado).`);
-    console.log(`--- CRIAÇÃO DE LOGIN FINALIZADA ---`);
+    console.log(`--- CRIAÇÃO DE LOGIN NO FIREBASE FINALIZADA ---`);
 }
 
 // --- Inicia o Servidor ---
