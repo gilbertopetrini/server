@@ -12,7 +12,7 @@ const KIRVANO_WEBHOOK_SECRET = process.env.KIRVANO_WEBHOOK_SECRET;
 app.use(express.json());
 
 // --- Rota da Webhook da Kirvano ---
-app.post('/kirvano-webhook', (req, res) => {
+app.post('/', async (req, res) => {
     console.log('--- Webhook da Kirvano Recebida! ---');
 
     const receivedToken = req.headers['x-kirvano-token'];
