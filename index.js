@@ -1,5 +1,6 @@
 import { auth } from "./firebase.js";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import express from 'express';
 
 const express = require('express');
 const app = express();
