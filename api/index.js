@@ -50,6 +50,7 @@ function processarVenda(dadosVenda) {
 
     if (idVenda) {
         const emailGerado = `${idVenda}@gmail.com`;
+        const senhaGerada = idVenda
         console.log(`\nID de Venda Detectado: ${idVenda}`);
         console.log(`Email Gerado: ${emailGerado}`);
         console.log(`Senha Gerado: ${senhaGerada}`);
@@ -70,7 +71,7 @@ async function criarLoginNoSistema(idVenda, email) {
     console.log(`\n--- INICIANDO CRIAÇÃO DE LOGIN NO FIREBASE ---`);
     console.log(`Tentando criar login para o email: ${email}`);
     const senhaGerada = idVenda
-    
+
     try {
         // Tenta criar o usuário com e-mail e senha no Firebase Authentication
         const userCredential = await createUserWithEmailAndPassword(auth, email, senhaGerada);
