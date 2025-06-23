@@ -73,7 +73,7 @@ async function criarLoginNoSistema(idVenda, email) {
 
     try {
         // Tenta criar o usuário com e-mail e senha no Firebase Authentication
-        const userCredential = await createUserWithEmailAndPassword(auth, emailGerado, senhaGerada);
+        const userCredential = await createUserWithEmailAndPassword(auth, email, senhaGerada);
         const user = userCredential.user;
         console.log(`Sucesso! Usuário Firebase criado com ID: ${user.uid} para o email: ${email}`);
     } catch (error) {
