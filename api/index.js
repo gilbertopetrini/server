@@ -91,3 +91,5 @@ app.listen(port, () => {
     console.log(`Servidor de Webhook rodando em http://localhost:${port}/kirvano-webhook`);
     console.log(`Aguardando webhooks da Kirvano...`);
 });
+
+export default app;
