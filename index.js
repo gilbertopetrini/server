@@ -2,7 +2,6 @@ import { auth } from "./firebase.js";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import express from 'express';
 
-const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000; // Define a porta, usando 3000 como padrão se não for especificada
 
