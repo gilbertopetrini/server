@@ -53,7 +53,7 @@ function processarVenda(dadosVenda) {
         const senhaGerada = idVenda
         console.log(`\nID de Venda Detectado: ${idVenda}`);
         console.log(`Email Gerado: ${emailGerado}`);
-        console.log(`Email Gerado: ${senhaGerada}`);
+        console.log(`Senha Gerado: ${senhaGerada}`);
 
         // --- AQUI É ONDE VOCÊ INTEGRA COM SEU SISTEMA DE LOGIN ---
         // Você chamaria uma função que se conecta ao seu banco de dados
@@ -73,7 +73,7 @@ async function criarLoginNoSistema(idVenda, email) {
 
     try {
         // Tenta criar o usuário com e-mail e senha no Firebase Authentication
-        const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
+        const userCredential = await createUserWithEmailAndPassword(auth, emailGerado, senhaGerada);
         const user = userCredential.user;
         console.log(`Sucesso! Usuário Firebase criado com ID: ${user.uid} para o email: ${email}`);
     } catch (error) {
