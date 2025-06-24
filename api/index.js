@@ -29,7 +29,7 @@ app.post('/', async (req, res) => {
         console.log(`[DEBUG]   ${header}: ${req.headers[header]}`);
     }
 
-    const receivedToken = req.headers['x-kirvano-token'];
+    const receivedToken = req.headers['security-token'];
 
     // CORREÇÃO: Removi os logs de debug que já cumpriram seu propósito
     // e reativei a verificação de segurança, que é crucial em produção.
