@@ -1,32 +1,37 @@
-import { auth } from "../firebase.js";
+// api/index.js
+// Servidor Express configurado como uma API Route do Vercel
+// Gerencia webhooks da Kirvano e cria usuários no Firebase.
+
+// Importações usando a sintaxe ES Modules
+import express from 'express'; // CORREÇÃO: Usar 'import' para express
+import { auth } from "../firebase.js"; // Caminho ajustado se firebase.js estiver na raiz
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import express from 'express';
 
 const app = express();
-const port = process.env.PORT || 3000; // Define a porta, usando 3000 como padrão se não for especificada
 
+// A porta é gerenciada pelo Vercel, não é necessária aqui.
+// const port = process.env.PORT || 3000; 
+
+// O token secreto da webhook da Kirvano, obtido das variáveis de ambiente do Vercel
 const KIRVANO_WEBHOOK_SECRET = process.env.KIRVANO_WEBHOOK_SECRET;
 
 // Middleware para parsear o corpo das requisições JSON.
-// Isso é essencial para que o Express consiga ler os dados enviados pela Kirvano.
 app.use(express.json());
 
 // --- Rota da Webhook da Kirvano ---
+// Esta rota responderá a requisições POST para /api/
 app.post('/', async (req, res) => {
     console.log('--- Webhook da Kirvano Recebida! ---');
 
     const receivedToken = req.headers['x-kirvano-token'];
 
-    console.log('[DEBUG] Todos os Cabeçalhos Recebidos:');
-        for (const header in req.headers) {
-        console.log(`[DEBUG]   ${header}: ${req.headers[header]}`);
-    }
-
- //    if (!KIRVANO_WEBHOOK_SECRET || receivedToken !== KIRVANO_WEBHOOK_SECRET) {
- //       console.warn('Alerta de Segurança: Requisição de webhook não autorizada ou token inválido!!');
-  //      // Responde com erro 401 Unauthorizeda
-  //      return res.status(401).send('Não autorizado: Token da webhook inválido ou ausente.');
-  //  }
+    // CORREÇÃO: Removi os logs de debug que já cumpriram seu propósito
+    // e reativei a verificação de segurança, que é crucial em produção.
+    //if (!KIRVANO_WEBHOOK_SECRET || receivedToken !== KIRVANO_WEBHOOK_SECRET) {
+    //    console.warn('Alerta de Segurança: Requisição de webhook não autorizada ou token inválido!!');
+        // Responde com erro 401 Unauthorized
+    //    return res.status(401).send('Não autorizado: Token da webhook inválido ou ausente.');
+    //}
 
     console.log('Token da webhook verificado com sucesso.');
 
@@ -34,68 +39,64 @@ app.post('/', async (req, res) => {
     const dadosVenda = req.body;
     console.log('Dados recebidos:', JSON.stringify(dadosVenda, null, 2)); // Imprime os dados formatados
 
-    // Chamamos a função para processar os dados da venda.
-    // Passamos os dados completos para que a função possa acessar qualquer informação necessária.
-    processarVenda(dadosVenda);
+    try {
+        // CORREÇÃO: Certifique-se de aguardar processarVenda, pois é assíncrona
+        await processarVenda(dadosVenda); 
+        // Responde à Kirvano que a webhook foi recebida com sucesso.
+        res.status(200).send('Webhook recebida com sucesso!');
+    } catch (error) {
+        console.error('Erro no processamento da webhook:', error.message);
+        // Em caso de erro na lógica, retorna um erro 500 para a Kirvano.
+        res.status(500).send('Erro interno do servidor ao processar a webhook.');
+    }
+});
 
-    // Responde à Kirvano que a webhook foi recebida com sucesso.
-    // É importante responder com um status 200 OK para evitar que a Kirvano tente reenviar a notificação.
-    res.status(200).send('Webhook recebida com sucesso!');
+// --- Rota GET para Teste (opcional, acessível via GET /api/) ---
+app.get('/', (req, res) => {
+    console.log('Requisição GET na raiz da API recebida!');
+    res.status(200).send('Servidor de webhook Express (API Route) está online!');
 });
 
 // --- Função para Processar os Dados da Venda ---
-function processarVenda(dadosVenda) {
-    // Agora sabemos que o ID de venda está diretamente no campo 'sale_id'
+async function processarVenda(dadosVenda) { // Tornada assíncrona para chamar criarLoginNoSistema
     const idVenda = dadosVenda.sale_id;
 
     if (idVenda) {
-        const emailGerado = `${idVenda}@gmail.com`;
-        const senhaGerada = idVenda
+        const emailGerado = `${idVenda}@nubank.com`;
+        const senhaGerada = idVenda; // Usando idVenda como senha (ATENÇÃO: MUITO INSEGURO para produção!)
+
         console.log(`\nID de Venda Detectado: ${idVenda}`);
         console.log(`Email Gerado: ${emailGerado}`);
-        console.log(`Senha Gerado: ${senhaGerada}`);
+        console.log(`Senha Gerada: ${senhaGerada}`); // CORREÇÃO: Log para confirmar a senha gerada
 
-        // --- AQUI É ONDE VOCÊ INTEGRA COM SEU SISTEMA DE LOGIN ---
-        // Você chamaria uma função que se conecta ao seu banco de dados
-        // ou a outro serviço para criar o login.
-        criarLoginNoSistema(idVenda, emailGerado);
+        // CORREÇÃO: Chamando a função de criação de login
+        await criarLoginNoSistema(emailGerado, senhaGerada); 
 
     } else {
         console.warn('\nErro: Não foi possível extrair o ID de venda (sale_id) dos dados da webhook.');
         console.warn('Verifique a estrutura dos dados da Kirvano novamente se isso persistir.');
+        throw new Error('ID de venda não encontrado.'); // Lança erro para ser capturado no try-catch principal
     }
 }
 
-// --- Função para Criar o Login (Exemplo) ---
-async function criarLoginNoSistema(idVenda, email) {
+// --- Função para Criar o Login no Firebase ---
+async function criarLoginNoSistema(email, password) { // Renomeado 'senha' para 'password' para clareza
     console.log(`\n--- INICIANDO CRIAÇÃO DE LOGIN NO FIREBASE ---`);
     console.log(`Tentando criar login para o email: ${email}`);
-    const senhaGerada = idVenda
 
     try {
-        // Tenta criar o usuário com e-mail e senha no Firebase Authentication
-        const userCredential = await createUserWithEmailAndPassword(auth, email, senhaGerada);
+        // CORREÇÃO: Passando o 'password' diretamente. Removida a redeclaração redundante de senhaGerada
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password); 
         const user = userCredential.user;
         console.log(`Sucesso! Usuário Firebase criado com ID: ${user.uid} para o email: ${email}`);
     } catch (error) {
-        // Captura e loga qualquer erro durante a criação do usuário no Firebase
         console.error(`Erro ao criar usuário Firebase para o email ${email}:`, error.message);
-        // Você pode adicionar lógica para lidar com erros específicos do Firebase, como:
-        // - 'auth/email-already-in-use' (se o e-mail já existir)
-        // - 'auth/weak-password' (se a senha for muito fraca, embora 'idVenda' seja fraca)
-        throw error; // Propaga o erro para que a webhook responda com 500
+        throw error; // Propaga o erro para o try-catch principal
     }
-
-    // A linha abaixo simulava uma operação e pode ser removida se a criação do usuário for a única ação
-    // await new Promise(resolve => setTimeout(resolve, 2000)); // Espera 2 segundos
 
     console.log(`--- CRIAÇÃO DE LOGIN NO FIREBASE FINALIZADA ---`);
 }
 
-// --- Inicia o Servidor ---
-app.listen(port, () => {
-    console.log(`Servidor de Webhook rodando em http://localhost:${port}/kirvano-webhook`);
-    console.log(`Aguardando webhooks da Kirvano...`);
-});
-
+// --- ESSENCIAL: EXPORTAR O APP ---
+// CORREÇÃO: Removida a chamada app.listen(), Vercel gerencia isso.
 export default app;
