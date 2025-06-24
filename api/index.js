@@ -57,12 +57,6 @@ if (!KIRVANO_WEBHOOK_SECRET || receivedToken !== KIRVANO_WEBHOOK_SECRET) {
     }
 });
 
-// --- Rota GET para Teste (opcional, acessível via GET /api/) ---
-app.get('/', (req, res) => {
-    console.log('Requisição GET na raiz da API recebida!');
-    res.status(200).send('Servidor de webhook Express (API Route) está online!');
-});
-
 // --- Função para Processar os Dados da Venda ---
 async function processarVenda(dadosVenda) { // Tornada assíncrona para chamar criarLoginNoSistema
     const idVenda = dadosVenda.sale_id;
