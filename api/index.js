@@ -103,6 +103,10 @@ async function criarLoginNoSistema(email, password) { // Renomeado 'senha' para 
     console.log(`--- CRIAÇÃO DE LOGIN NO FIREBASE FINALIZADA ---`);
 }
 
+app.get('/favicon.ico', (req, res) => {
+    res.status(204).end(); // Responde com "No Content", sem um arquivo real
+});
+
 // --- ESSENCIAL: EXPORTAR O APP ---
 // CORREÇÃO: Removida a chamada app.listen(), Vercel gerencia isso.
 export default app;
