@@ -27,11 +27,11 @@ app.post('/', async (req, res) => {
 
     // CORREÇÃO: Removi os logs de debug que já cumpriram seu propósito
     // e reativei a verificação de segurança, que é crucial em produção.
-    //if (!KIRVANO_WEBHOOK_SECRET || receivedToken !== KIRVANO_WEBHOOK_SECRET) {
-    //    console.warn('Alerta de Segurança: Requisição de webhook não autorizada ou token inválido!!');
+if (!KIRVANO_WEBHOOK_SECRET || receivedToken !== KIRVANO_WEBHOOK_SECRET) {
+    console.warn('Alerta de Segurança: Requisição de webhook não autorizada ou token inválido!!');
         // Responde com erro 401 Unauthorized
-    //    return res.status(401).send('Não autorizado: Token da webhook inválido ou ausente.');
-    //}
+    return res.status(401).send('Não autorizado: Token da webhook inválido ou ausente.');
+}
 
     console.log('Token da webhook verificado com sucesso.');
 
