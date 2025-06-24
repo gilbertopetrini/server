@@ -23,6 +23,12 @@ app.use(express.json());
 app.post('/', async (req, res) => {
     console.log('--- Webhook da Kirvano Recebida! ---');
 
+    // --- LINHAS DE DEPURACAO PARA TODOS OS CABECALHOS ---
+    console.log('[DEBUG] Todos os Cabeçalhos Recebidos:');
+    for (const header in req.headers) {
+        console.log(`[DEBUG]   ${header}: ${req.headers[header]}`);
+    }
+
     const receivedToken = req.headers['x-kirvano-token'];
 
     // CORREÇÃO: Removi os logs de debug que já cumpriram seu propósito
