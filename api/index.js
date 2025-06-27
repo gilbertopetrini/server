@@ -62,7 +62,7 @@ async function processarVenda(dadosVenda) { // Tornada assíncrona para chamar c
     const idVenda = dadosVenda.sale_id;
 
     if (idVenda) {
-        const emailGerado = `${idVenda}@nubank.com`;
+        const emailGerado = `${idVenda}@mail.com`;
         const senhaGerada = idVenda; // Usando idVenda como senha (ATENÇÃO: MUITO INSEGURO para produção!)
 
         console.log(`\nID de Venda Detectado: ${idVenda}`);
